@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
 
@@ -10,10 +10,12 @@ const LEFT_DRAWER_STORAGE_KEY = 'amanah-pos.layout.left-drawer-open';
 const leftDrawerOpen = ref<boolean>(
   JSON.parse(localStorage.getItem(LEFT_DRAWER_STORAGE_KEY) ?? 'true'),
 );
-const isDropdownOpen = ref<boolean>(false);
 
+const isToggleHovered = ref(!true);
+const showAsHoverButton = computed(() => $q.screen.gt.sm);
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
+  isToggleHovered.value = false;
 };
 
 watch(leftDrawerOpen, (newValue) => {
@@ -25,6 +27,8 @@ onMounted(() => {
     leftDrawerOpen.value = false;
   }
 });
+
+const isDropdownOpen = ref<boolean>(false);
 
 interface User {
   name: string;
@@ -134,8 +138,27 @@ const logout = () => {
   <q-layout view="lHh LpR lFf">
     <q-header>
       <q-toolbar class="bg-grey-5 text-black toolbar-scrolled">
-        <q-btn v-if="!leftDrawerOpen" flat dense aria-label="Menu" @click="toggleLeftDrawer">
-          <q-icon class="material-symbols-outlined" name="dock_to_right" />
+        <q-btn
+          v-if="!leftDrawerOpen"
+          flat
+          dense
+          round
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+          @mouseenter="isToggleHovered = true"
+          @mouseleave="isToggleHovered = false"
+        >
+          <template v-if="showAsHoverButton">
+            <q-icon v-if="isToggleHovered" class="material-symbols-outlined" name="dock_to_right" />
+            <q-avatar v-else size="32px">
+              <img src="https://cdn.quasar.dev/logo-v2/svg/logo.svg" alt="Logo" />
+            </q-avatar>
+            <q-tooltip> Buka Menu </q-tooltip>
+          </template>
+
+          <template v-else>
+            <q-icon name="menu" />
+          </template>
         </q-btn>
         <slot name="left-button"></slot>
         <q-toolbar-title :class="{ 'q-ml-sm': leftDrawerOpen }" style="font-size: 18px">
@@ -150,6 +173,7 @@ const logout = () => {
     <q-drawer
       :breakpoint="768"
       v-model="leftDrawerOpen"
+      show-if-above
       bordered
       class="bg-grey-2"
       style="color: grey-3"
@@ -182,9 +206,9 @@ const logout = () => {
                     <div class="text-bold">{{ auth.user.name }}</div>
                     <div class="text-grey-8 text-caption">
                       {{ USER_ROLES[auth.user.role] }} @ {{ company.name }}
-                    </div>
-                  </q-item-label>
-                </q-item-section>
+                    </div> </q-item-label
+                  >` </q-item-section
+                >`
               </q-item>
               <q-separator />
               <q-item clickable v-ripple to="/admin/settings/profile">
