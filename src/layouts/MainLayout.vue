@@ -3,12 +3,9 @@ import { ref, onMounted, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
 
-// --- SETUP DASAR ---
 const $q = useQuasar();
-const route = useRoute(); // Untuk mendapatkan info route saat ini (misal: path URL)
-// const router = useRouter(); // Untuk melakukan navigasi programatik (misal: logout)
+const route = useRoute();
 
-// --- STATE MANAGEMENT UNTUK LAYOUT ---
 const LEFT_DRAWER_STORAGE_KEY = 'amanah-pos.layout.left-drawer-open';
 const leftDrawerOpen = ref<boolean>(
   JSON.parse(localStorage.getItem(LEFT_DRAWER_STORAGE_KEY) ?? 'true'),
@@ -29,9 +26,6 @@ onMounted(() => {
   }
 });
 
-// --- SIMULASI DATA BACKEND (PENGGANTI INERTIA) ---
-
-// Definisikan tipe data untuk user dan company
 interface User {
   name: string;
   role: 'ADMIN' | 'CASHIER';
@@ -40,26 +34,22 @@ interface Company {
   name: string;
 }
 
-// Data user dan company (sebelumnya dari page.props)
 const auth = ref<{ user: User }>({
   user: {
-    name: 'STATER POSN',
+    name: 'POSv1',
     role: 'ADMIN',
   },
 });
 
 const company = ref<Company>({
-  name: 'STATER POSN',
+  name: 'POSv1',
 });
 
-// Definisikan konstanta role
 const USER_ROLES = {
   ADMIN: 'Administrator',
   CASHIER: 'Kasir',
 };
 
-// --- SIMULASI NAVIGASI & MENU ---
-// Mendefinisikan menu dalam bentuk array of objects agar template lebih bersih
 const menuItems = ref([
   {
     label: 'Dashboard',
@@ -126,43 +116,30 @@ const menuItems = ref([
   },
 ]);
 
-// Fungsi untuk mengecek apakah menu harus ditampilkan berdasarkan role user
 const canViewMenu = (item: { requiredRole?: string[] }): boolean => {
-  if (!item.requiredRole) return true; // Jika tidak ada role, semua bisa lihat
+  if (!item.requiredRole) return true;
   return item.requiredRole.includes(auth.value.user.role);
 };
 
-// Fungsi untuk menentukan apakah expansion item harus terbuka default
-// const isGroupActive = (pathPrefix: string) => {
-//   // Cari anak menu yang path-nya berawalan sama dengan pathPrefix
-//   const group = menuItems.value.find((item) =>
-//     item.children?.some((child) => child.to?.startsWith(pathPrefix)),
-//   );
-//   // Jika ada anak menu yang aktif, buka grupnya
-//   return group?.children?.some((child) => route.path.startsWith(child.to ?? '')) ?? false;
-// };
-
-// Fungsi simulasi logout
 const logout = () => {
   $q.notify({
     color: 'positive',
     icon: 'logout',
     message: 'Anda telah logout.',
   });
-  // router.push('/login');
 };
 </script>
 
 <template>
   <q-layout view="lHh LpR lFf">
     <q-header>
-      <q-toolbar class="bg-grey-1 text-black toolbar-scrolled">
+      <q-toolbar class="bg-grey-5 text-black toolbar-scrolled">
         <q-btn v-if="!leftDrawerOpen" flat dense aria-label="Menu" @click="toggleLeftDrawer">
           <q-icon class="material-symbols-outlined" name="dock_to_right" />
         </q-btn>
         <slot name="left-button"></slot>
         <q-toolbar-title :class="{ 'q-ml-sm': leftDrawerOpen }" style="font-size: 18px">
-          <slot name="title">Amanah POS</slot>
+          <slot name="title">POSv1</slot>
         </q-toolbar-title>
         <q-space />
         <slot name="right-button"></slot>
@@ -175,7 +152,7 @@ const logout = () => {
       v-model="leftDrawerOpen"
       bordered
       class="bg-grey-2"
-      style="color: #444"
+      style="color: grey-3"
     >
       <div
         class="absolute-top"
@@ -186,7 +163,7 @@ const logout = () => {
           justify-content: center;
         "
       >
-       <div style="width: 100%; padding: 8px; display: flex; justify-content: space-between">
+        <div style="width: 100%; padding: 8px; display: flex; justify-content: space-between">
           <q-btn-dropdown
             v-model="isDropdownOpen"
             class="profile-btn text-bold"
@@ -285,7 +262,7 @@ const logout = () => {
           </template>
         </q-list>
         <div class="absolute-bottom text-grey-6 q-pa-md">
-          &copy; {{ new Date().getFullYear() }} - Amanah POS v1.0.0
+          &copy; {{ new Date().getFullYear() }} - POS v1.0.0
         </div>
       </q-scroll-area>
     </q-drawer>
